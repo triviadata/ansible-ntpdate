@@ -1,0 +1,15 @@
+---
+- name: Install ntpdate
+  package:
+    name: ntpdate
+    state: present
+
+- name: Check if ntpdate is needed
+  command: "ntpdate -q {{ ntpdate_server }}"
+  register: ntpdate_query
+  changed_when: False
+
+- name: Run ntpdate to synchronize server with {{ ntpdate_server }}
+  command: "ntpdate {{ ntpdate_server }}"
+  check_mode: no
+  when: ntpdate_query.stdout is not regex('offset -?0.[0-9]* sec')

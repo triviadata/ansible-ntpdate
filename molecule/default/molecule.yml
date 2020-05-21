@@ -3,29 +3,20 @@ dependency:
   name: galaxy
 driver:
   name: docker
-lint:
-  name: yamllint
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
 platforms:
-  - name: centos7
-    image: centos:7
-  - name: centos6
-    image: centos:6
-  - name: debian9
-    image: debian:9
-  - name: debian8
-    image: debian:8
-  - name: ubuntu1804
-    image: ubuntu:18.04
-  - name: ubuntu1604
-    image: ubuntu:16.04
-  - name: ubuntu1404
-    image: ubuntu:14.04
+  - name: instance
+    image: "geerlingguy/docker-${MOLECULE_DISTRO:-centos7}-ansible:latest"
+    command: ${MOLECULE_DOCKER_COMMAND:-""}
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    pre_build_image: true
 
 provisioner:
   name: ansible
-  lint:
-    name: ansible-lint
-verifier:
-  name: testinfra
-  lint:
-    name: flake8
+  playbooks:
+    converge: ${MOLECULE_PLAYBOOK:-converge.yml}

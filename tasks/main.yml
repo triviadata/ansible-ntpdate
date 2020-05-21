@@ -11,5 +11,6 @@
 
 - name: Run ntpdate to synchronize server with {{ ntpdate_server }}
   command: "ntpdate {{ ntpdate_server }}"
-  check_mode: no
-  when: ntpdate_query.stdout is not regex('offset -?0.[0-9]* sec')
+  when:
+    - not ansible_check_mode
+    - ntpdate_query.stdout is not regex('offset -?0.[0-9]* sec')
